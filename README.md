@@ -20,7 +20,17 @@ gem "downstream", "~> 1.0"
 
 ## Usage
 
-Under the hood it's a wrapper for `ActiveSupport::Notifications`. But it provides a way more handy interface to build reactive apps. Each event has a strict schema described by a separate class. Also, the gem has convenient tooling to write tests.
+Downstream provides a way more handy interface to build reactive apps. Each event has a strict schema described by a separate class. The gem has convenient tooling to write tests.
+
+Downstream supports various adapters for event handling. It can be configured in a Rails initializer `config/initializers/downstream.rb`:
+
+```ruby
+Downstream.configure do |config|
+  config.pubsub = :stateless # it's a default adapter
+end
+```
+
+For now, it's implemented only one adapter. The `stateless` adapter is based on `ActiveSupport::Notifications`, and it doesn't store history events anywhere. All event invocations are synchronous. Adding asynchronous subscribers are on my road map.
 
 ### Describe events
 
@@ -77,7 +87,7 @@ initializer "my_engine.subscribe_to_events" do
     store.subscribe MyEventHandler, to: ProfileCreated
 
     # anonymous handler (could only be synchronous)
-    store.subscribe(to: ProfileCreated) do |name, event|
+    store.subscribe(to: ProfileCreated) do |event|
       # do something
     end
 
@@ -92,6 +102,15 @@ end
 **NOTE:** event handler **must** be a callable object.
 
 Although subscriber could be any callable Ruby object, that have specific input format (event); thus we suggest putting subscribers under `app/subscribers/on_<event_type>/<subscriber.rb>`, e.g. `app/subscribers/on_profile_created/create_chat_user.rb`).
+
+Sometimes, you may be interested in using temporary subscriptions. For that, you can use this:
+
+```ruby
+subscriber = ->(event) { my_event_handler(event) }
+Downstream.subscribed(subscriber, to: ProfileCreated) do
+  some_invocation
+end
+```
 
 ## Testing
 

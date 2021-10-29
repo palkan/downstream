@@ -5,40 +5,46 @@ require "active_model"
 
 require "downstream/config"
 require "downstream/event"
+require "downstream/pubsub_adapters/abstract_pubsub"
 require "downstream/rspec" if defined?(RSpec)
 
 module Downstream
   class << self
+    delegate :pubsub, to: :config
+
     def config
       @config ||= Config.new
     end
 
+    def configure
+      yield config
+    end
+
     def subscribe(subscriber = nil, to: nil, &block)
-      to ||= infer_event_from_subscriber(subscriber) if subscriber.is_a?(Module)
-
-      if to.nil?
-        raise ArgumentError, "Couldn't infer event from subscriber. " \
-                              "Please, specify event using `to:` option"
-      end
-
       subscriber ||= block if block
+      raise ArgumentError, "Subsriber must be present" if subscriber.nil?
 
-      if subscriber.nil?
-        raise ArgumentError, "Subsriber must be present"
-      end
+      identifier = construct_identifier(subscriber, to)
 
-      identifier =
-        if to.is_a?(Class) && Event >= to
-          to.identifier
-        else
-          to
-        end
-
-      ActiveSupport::Notifications.subscribe("#{config.namespace}.#{identifier}", subscriber)
+      pubsub.subscribe(identifier, subscriber)
     end
 
     # temporary subscriptions
     def subscribed(subscriber, to: nil, &block)
+      raise ArgumentError, "Subsriber must be present" if subscriber.nil?
+
+      identifier = construct_identifier(subscriber, to)
+
+      pubsub.subscribed(identifier, subscriber, &block)
+    end
+
+    def publish(event)
+      pubsub.publish("#{config.namespace}.#{event.type}", event)
+    end
+
+    private
+
+    def construct_identifier(subscriber, to)
       to ||= infer_event_from_subscriber(subscriber) if subscriber.is_a?(Module)
 
       if to.nil?
@@ -46,21 +52,14 @@ module Downstream
                               "Please, specify event using `to:` option"
       end
 
-      identifier =
-        if to.is_a?(Class) && Event >= to
-          to.identifier
-        else
-          to
-        end
+      identifier = if to.is_a?(Class) && Event >= to
+        to.identifier
+      else
+        to
+      end
 
-      ActiveSupport::Notifications.subscribed(subscriber, "#{config.namespace}.#{identifier}", &block)
+      "#{config.namespace}.#{identifier}"
     end
-
-    def publish(event)
-      ActiveSupport::Notifications.publish("#{config.namespace}.#{event.type}", event)
-    end
-
-    private
 
     def infer_event_from_subscriber(subscriber)
       event_class_name = subscriber.name.split("::").yield_self do |parts|

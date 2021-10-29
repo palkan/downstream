@@ -52,17 +52,17 @@ module Downstream
     def matches?(block)
       raise ArgumentError, "have_published_event only supports block expectations" unless block.is_a?(Proc)
 
-      events = []
-      namespace = /^#{Downstream.config.namespace}\./
-      ActiveSupport::Notifications.subscribed(->(name, event) { events << event }, namespace) do
-        block.call
+      @matching_events = []
+
+      subscriber = ->(event) do
+        if attributes.nil? || attributes_match?(event)
+          @matching_events << event
+        end
       end
 
-      @matching_events, @unmatching_events =
-        events.partition do |actual_event|
-          (event_class.identifier == actual_event.type) &&
-            (attributes.nil? || attributes_match?(actual_event))
-        end
+      Downstream.subscribed(subscriber, to: event_class) do
+        block.call
+      end
 
       @matching_count = @matching_events.size
 
@@ -75,16 +75,7 @@ module Downstream
 
     def failure_message
       (+"expected to publish #{event_class.identifier} event").tap do |msg|
-        msg << " #{message_expectation_modifier}, but"
-
-        if @unmatching_events.any?
-          msg << " published the following events:"
-          @unmatching_events.each do |unmatching_event|
-            msg << "\n  #{unmatching_event.inspect}"
-          end
-        else
-          msg << " haven't published anything"
-        end
+        msg << " #{message_expectation_modifier}, but haven't published"
       end
     end
 

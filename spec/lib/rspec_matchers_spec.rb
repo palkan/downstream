@@ -37,7 +37,7 @@ describe "RSpec matchers" do
         expect do
           expect { true }
             .to have_published_event(event_class)
-        end.to raise_error(/to publish test_event.+exactly once, but haven't published anything/)
+        end.to raise_error(/to publish test_event.+exactly once, but haven't published/)
       end
 
       specify "class doesn't match" do

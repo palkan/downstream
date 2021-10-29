@@ -5,10 +5,10 @@ require "spec_helper"
 describe "sync #subscribe" do
   let(:event_class) { Downstream::TestEvent }
 
-  it "subscribe with block" do
+  it "subscribes with block" do
     events_seen = []
 
-    Downstream.subscribe(to: event_class) do |_name, event|
+    Downstream.subscribe(to: event_class) do |event|
       events_seen << event
     end
 
@@ -26,7 +26,7 @@ describe "sync #subscribe" do
     expect(events_seen.last).to eq event2
   end
 
-  it "subscribe with callable using identifier" do
+  it "subscribes with callable using identifier" do
     callables = 2.times.map do
       Module.new do
         class << self
@@ -34,7 +34,7 @@ describe "sync #subscribe" do
             @events ||= []
           end
 
-          def call(_name, event)
+          def call(event)
             events << event
           end
         end
@@ -61,5 +61,28 @@ describe "sync #subscribe" do
       expect(callable.events.size).to eq 2
       expect(callable.events.last).to eq event2
     end
+  end
+
+  it "temporary subscribes" do
+    event = event_class.new(user_id: 0)
+
+    events_seen = []
+
+    subscriber = ->(event) do
+      events_seen << event
+    end
+
+    Downstream.subscribed(subscriber, to: event_class) do
+      Downstream.publish event
+    end
+
+    expect(events_seen.size).to eq 1
+    expect(events_seen.last).to eq event
+
+    events_seen = []
+
+    Downstream.publish event
+
+    expect(events_seen.size).to eq 0
   end
 end

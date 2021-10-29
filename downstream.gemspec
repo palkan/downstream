@@ -4,7 +4,6 @@ lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "downstream/version"
 
-# rubocop:disable Metrics/BlockLength
 Gem::Specification.new do |spec|
   spec.name = "downstream"
   spec.version = Downstream::VERSION
@@ -37,4 +36,3 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "standard", "~> 1.3"
 end
-# rubocop:enable Metrics/BlockLength

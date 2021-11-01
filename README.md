@@ -27,6 +27,7 @@ Downstream supports various adapters for event handling. It can be configured in
 ```ruby
 Downstream.configure do |config|
   config.pubsub = :stateless # it's a default adapter
+  config.async_queue = :high_priority # nil by default
 end
 ```
 
@@ -111,6 +112,20 @@ Downstream.subscribed(subscriber, to: ProfileCreated) do
   some_invocation
 end
 ```
+
+If you want to handle events in a background job, you can pass the `async: true` option:
+
+```ruby
+store.subscribe OnProfileCreated::DoThat, async: true
+```
+
+By default, a job will be enqueued into `async_queue` name from the Downstream config. You can define your own queue name for a specific subscriber:
+
+```ruby
+store.subscribe OnProfileCreated::DoThat, async: {queue: :low_priority}
+```
+
+**NOTE:** all subscribers are synchronous by default
 
 ## Testing
 

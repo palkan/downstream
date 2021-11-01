@@ -2,6 +2,20 @@
 
 require "spec_helper"
 
+module TestSubscriptions
+  module AsyncCallable
+    class << self
+      def events
+        @events ||= []
+      end
+
+      def call(event)
+        events << event
+      end
+    end
+  end
+end
+
 describe "sync #subscribe" do
   let(:event_class) { Downstream::TestEvent }
 
@@ -84,5 +98,15 @@ describe "sync #subscribe" do
     Downstream.publish event
 
     expect(events_seen.size).to eq 0
+  end
+
+  it "subscribes async" do
+    Downstream.subscribe(TestSubscriptions::AsyncCallable, to: event_class, async: true)
+
+    event = event_class.new(user_id: 0)
+
+    expect { Downstream.publish(event) }.to have_enqueued_job(Downstream::Stateless::SubscriberJob)
+      .with(event, "TestSubscriptions::AsyncCallable")
+    expect(TestSubscriptions::AsyncCallable.events).to be_empty
   end
 end

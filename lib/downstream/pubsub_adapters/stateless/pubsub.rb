@@ -4,10 +4,10 @@ require_relative "subscriber"
 module Downstream
   module Stateless
     class Pubsub < AbstractPubsub
-      def subscribe(identifier, callable)
+      def subscribe(identifier, callable, async: false)
         ActiveSupport::Notifications.subscribe(
           identifier,
-          Subscriber.new(callable)
+          Subscriber.new(callable, async: async)
         )
       end
 

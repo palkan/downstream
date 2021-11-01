@@ -1,10 +1,24 @@
 # frozen_string_literal: true
 
+GlobalID::Locator.use :downstream do |gid|
+  params = gid.params.each_with_object({}) do |(key, value), memo|
+    memo[key.to_sym] = if value.is_a?(String) && value.start_with?("gid://")
+      GlobalID::Locator.locate(value)
+    else
+      value
+    end
+  end
+
+  gid.model_name.constantize
+    .new(event_id: gid.model_id, **params)
+end
+
 module Downstream
   class Event
     extend ActiveModel::Naming
+    include GlobalID::Identification
 
-    RESERVED_ATTRIBUTES = %i[event_id type].freeze
+    RESERVED_ATTRIBUTES = %i[id event_id type].freeze
 
     class << self
       attr_writer :identifier
@@ -57,6 +71,8 @@ module Downstream
 
     attr_reader :event_id, :data, :errors
 
+    alias_method :id, :event_id
+
     def initialize(event_id: nil, **params)
       @event_id = event_id || SecureRandom.hex(10)
       validate_attributes!(params)
@@ -77,6 +93,20 @@ module Downstream
       }
     end
 
+    def to_global_id
+      new_data = data.each_with_object({}) do |(key, value), memo|
+        memo[key] = if value.respond_to?(:to_global_id)
+          value.to_global_id
+        else
+          value
+        end
+      end
+
+      super(new_data.merge!(app: :downstream))
+    end
+
+    alias_method :to_gid, :to_global_id
+
     def inspect
       "#{self.class.name}<#{type}##{event_id}>, data: #{data}"
     end
@@ -84,6 +114,15 @@ module Downstream
     def read_attribute_for_validation(attr)
       data.fetch(attr)
     end
+
+    def ==(other)
+      super ||
+        other.instance_of?(self.class) &&
+          !event_id.nil? &&
+          other.event_id == event_id
+    end
+
+    alias_method :eql?, :==
 
     private
 

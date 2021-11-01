@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 require "active_support"
+require "active_job"
 require "active_model"
+require "globalid"
+require "after_commit_everywhere"
 
 require "downstream/config"
 require "downstream/event"
@@ -20,13 +23,13 @@ module Downstream
       yield config
     end
 
-    def subscribe(subscriber = nil, to: nil, &block)
+    def subscribe(subscriber = nil, to: nil, async: false, &block)
       subscriber ||= block if block
       raise ArgumentError, "Subsriber must be present" if subscriber.nil?
 
       identifier = construct_identifier(subscriber, to)
 
-      pubsub.subscribe(identifier, subscriber)
+      pubsub.subscribe(identifier, subscriber, async: async)
     end
 
     # temporary subscriptions

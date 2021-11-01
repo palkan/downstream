@@ -4,6 +4,7 @@ require "active_support/inflections"
 
 module Downstream
   class Config
+    attr_accessor :async_queue
     attr_writer :namespace
 
     def namespace

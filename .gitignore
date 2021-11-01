@@ -6,7 +6,7 @@
 /gemfiles/
 /pkg/
 /spec/reports/
-/tmp/
+tmp/
 .pry_history
 .rspec_status
 Gemfile.lock

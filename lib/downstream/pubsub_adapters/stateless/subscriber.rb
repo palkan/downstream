@@ -1,5 +1,3 @@
-require_relative "subscriber_job"
-
 module Downstream
   module Stateless
     class Subscriber
@@ -38,7 +36,20 @@ module Downstream
         end
       end
 
+      def subscribe(identifier)
+        @notification_subscriber = ActiveSupport::Notifications.subscribe(
+          identifier,
+          self
+        )
+      end
+
+      def unsubscribe
+        ActiveSupport::Notifications.unsubscribe(notification_subscriber)
+      end
+
       private
+
+      attr_reader :notification_subscriber
 
       def async_queue_name
         return @async_queue_name if defined?(@async_queue_name)

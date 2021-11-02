@@ -9,7 +9,7 @@ require "after_commit_everywhere"
 require "downstream/config"
 require "downstream/event"
 require "downstream/pubsub_adapters/abstract_pubsub"
-require "downstream/rspec" if defined?(RSpec)
+require "downstream/subscriber_job"
 
 module Downstream
   class << self

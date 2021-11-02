@@ -5,10 +5,7 @@ module Downstream
   module Stateless
     class Pubsub < AbstractPubsub
       def subscribe(identifier, callable, async: false)
-        ActiveSupport::Notifications.subscribe(
-          identifier,
-          Subscriber.new(callable, async: async)
-        )
+        Subscriber.new(callable, async: async).tap { |s| s.subscribe(identifier) }
       end
 
       def subscribed(identifier, callable, &block)

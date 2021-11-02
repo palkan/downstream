@@ -12,7 +12,7 @@ Combustion.initialize! :active_record, :action_controller, :active_job do
 end
 
 require "rspec/rails"
-require "downstream"
+require "downstream/rspec"
 
 Downstream.configure do |config|
   config.pubsub = :stateless

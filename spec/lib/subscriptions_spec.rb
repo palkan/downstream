@@ -105,7 +105,7 @@ describe "sync #subscribe" do
 
     event = event_class.new(user_id: 0)
 
-    expect { Downstream.publish(event) }.to have_enqueued_job(Downstream::Stateless::SubscriberJob)
+    expect { Downstream.publish(event) }.to have_enqueued_job(Downstream::SubscriberJob)
       .with(event, "TestSubscriptions::AsyncCallable")
     expect(TestSubscriptions::AsyncCallable.events).to be_empty
   end

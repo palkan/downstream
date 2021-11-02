@@ -131,6 +131,12 @@ store.subscribe OnProfileCreated::DoThat, async: {queue: :low_priority}
 
 You can test subscribers as normal Ruby objects.
 
+First, load testing helpers in the `spec_helper.rb`:
+
+```ruby
+require "downstream/rspec"
+```
+
 To test that a given subscriber exists, you can do the following:
 
 ```ruby
@@ -142,6 +148,14 @@ it "is subscribed to some event" do
   Downstream.publish event
 
   expect(MySubscriberService).to have_received(:call).with(event)
+end
+
+# for asynchronous subscriptions
+it "is subscribed to some event" do
+  event = MyEvent.new(some: "data")
+  expect { Downstream.publish event }.
+    to have_enqueued_async_subscriber_for(MySubscriberService).
+    with(event)
 end
 ```
 

@@ -16,7 +16,7 @@ module TestSubscriberJob
   end
 end
 
-describe Downstream::Stateless::SubscriberJob do
+describe Downstream::SubscriberJob do
   let(:event_class) { Downstream::TestEvent }
   let(:event) { event_class.new(user_id: 1) }
   let(:callable) { "TestSubscriberJob::Subscriber" }

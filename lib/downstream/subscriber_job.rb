@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Downstream
   class SubscriberJob < ActiveJob::Base
     def perform(event, callable)

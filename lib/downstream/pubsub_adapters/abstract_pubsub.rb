@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Downstream
   class AbstractPubsub
     def subscribe(identifier, callable)

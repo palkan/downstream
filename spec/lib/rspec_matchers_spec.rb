@@ -62,4 +62,63 @@ describe "RSpec matchers" do
       end
     end
   end
+
+  describe "#have_async_enqueued_subscriber_for" do
+    before do
+      Downstream::TestSubscriber =
+        Module.new do
+          class << self
+            def call(_event)
+            end
+          end
+        end
+    end
+
+    after do
+      Downstream.send(:remove_const, :TestSubscriber) if
+        Downstream.const_defined?(:TestSubscriber)
+    end
+
+    let(:subscriber_class) { Downstream::TestSubscriber }
+
+    specify "success" do
+      subscriber = Downstream.subscribe(subscriber_class, to: event_class, async: true)
+
+      expect { Downstream.publish event }
+        .to have_enqueued_async_subscriber_for(subscriber_class)
+
+      subscriber.unsubscribe
+    end
+
+    specify "success with event" do
+      subscriber = Downstream.subscribe(subscriber_class, to: event_class, async: true)
+
+      expect { Downstream.publish event }
+        .to have_enqueued_async_subscriber_for(subscriber_class).with(event)
+
+      subscriber.unsubscribe
+    end
+
+    specify "failure when no async subscribers" do
+      subscriber = Downstream.subscribe(subscriber_class, to: event_class)
+
+      expect do
+        expect { Downstream.publish event }
+          .not_to have_enqueued_async_subscriber_for(subscriber_class)
+      end
+
+      subscriber.unsubscribe
+    end
+
+    specify "failure when wrong event type" do
+      subscriber = Downstream.subscribe(subscriber_class, to: event_class)
+
+      expect do
+        expect { Downstream.publish event }
+          .to have_enqueued_async_subscriber_for(subscriber_class).with(event2)
+      end.to raise_error(/expected to enqueue/)
+
+      subscriber.unsubscribe
+    end
+  end
 end

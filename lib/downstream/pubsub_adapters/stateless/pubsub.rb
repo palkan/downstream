@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_support/notifications"
 require_relative "subscriber"
 
@@ -5,10 +7,7 @@ module Downstream
   module Stateless
     class Pubsub < AbstractPubsub
       def subscribe(identifier, callable, async: false)
-        ActiveSupport::Notifications.subscribe(
-          identifier,
-          Subscriber.new(callable, async: async)
-        )
+        Subscriber.new(callable, async: async).tap { |s| s.subscribe(identifier) }
       end
 
       def subscribed(identifier, callable, &block)

@@ -1,0 +1,15 @@
+require: standard
+
+inherit_gem:
+  standard: config/base.yml
+
+AllCops:
+  TargetRubyVersion: 2.6
+  Exclude:
+    - 'gemfiles/*'
+    - 'tmp/**/*'
+  DisplayCopNames: true
+  SuggestExtensions: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: true

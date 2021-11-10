@@ -3,7 +3,7 @@
 
 # Downstream
 
-This gem provides a straightforward way to implement communication between Rails Engines using the Publish-Subscribe pattern. The gem allows decreasing decoupling engines with events. An event is a recorded object in the system that reflects an action that the engine performs, and the params that lead to its creation.
+This gem provides a straightforward way to implement communication between Rails Engines using the Publish-Subscribe pattern. The gem allows decreasing the coupling of engines with events. An event is a recorded object in the system that reflects an action that the engine performs, and the params that lead to its creation.
 
 The gem inspired by [`active_event_store`](https://github.com/palkan/active_event_store), and initially based on its codebase. Having said that, it does not store in a database all happened events which ensures simplicity and performance.
 

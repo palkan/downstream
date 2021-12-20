@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.5"
 
   spec.add_dependency "after_commit_everywhere", "~> 1.0"
-  spec.add_dependency "globalid", "~> 0.5"
+  spec.add_dependency "globalid", "~> 1.0"
   spec.add_dependency "rails", ">= 6"
 
   spec.add_development_dependency "appraisal", "~> 2.2"

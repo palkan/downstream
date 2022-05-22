@@ -17,10 +17,10 @@ module Downstream
 
     def pubsub=(value)
       @pubsub = case value
-        when String, Symbol
-          lookup_pubsub(value)
-        else
-          value
+      when String, Symbol
+        lookup_pubsub(value)
+      else
+        value
       end
     end
 

@@ -19,7 +19,7 @@ module Downstream
       end
 
       def publish(identifier, event)
-        ActiveSupport::Notifications.publish(identifier, event)
+        ActiveSupport::Notifications.instrument(identifier, event)
       end
     end
   end

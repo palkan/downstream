@@ -16,7 +16,7 @@ module Downstream
         !!async
       end
 
-      def call(_name, event)
+      def call(_name, _start, _finish, _id, event)
         if async?
           if callable.is_a?(Proc) || callable.name.nil?
             raise ArgumentError, "Anonymous subscribers (blocks/procs/lambdas or anonymous modules) cannot be asynchronous"

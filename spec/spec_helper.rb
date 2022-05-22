@@ -9,6 +9,7 @@ Combustion.initialize! :active_record, :action_controller, :active_job do
   config.logger = Logger.new(nil)
   config.log_level = :fatal
   config.active_job.queue_adapter = :test
+  config.server_timing = true
 end
 
 require "rspec/rails"

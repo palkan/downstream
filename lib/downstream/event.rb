@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-GlobalID::Locator.use :downstream do |gid|
+GlobalID::Locator.use "downstream" do |gid|
   params = gid.params.each_with_object({}) do |(key, value), memo|
     memo[key.to_sym] = if value.is_a?(String) && value.start_with?("gid://")
       GlobalID::Locator.locate(value)
@@ -102,7 +102,7 @@ module Downstream
         end
       end
 
-      super(new_data.merge!(app: :downstream))
+      super(new_data.merge!(app: "downstream"))
     end
 
     alias_method :to_gid, :to_global_id

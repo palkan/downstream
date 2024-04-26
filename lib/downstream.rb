@@ -55,7 +55,7 @@ module Downstream
                               "Please, specify event using `to:` option"
       end
 
-      identifier = if to.is_a?(Class) && Event >= to
+      identifier = if to.is_a?(Class) && Event >= to # rubocop:disable Style/YodaCondition
         to.identifier
       else
         to

@@ -6,7 +6,7 @@ module Downstream
   class Engine < ::Rails::Engine
     config.downstream = Downstream.config
 
-    config.to_prepare do
+    config.after_initialize do
       ActiveSupport.run_load_hooks("downstream-events", Downstream)
     end
   end

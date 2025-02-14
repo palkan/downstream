@@ -153,9 +153,9 @@ end
 # for asynchronous subscriptions
 it "is subscribed to some event" do
   event = MyEvent.new(some: "data")
-  expect { Downstream.publish event }.
-    to have_enqueued_async_subscriber_for(MySubscriberService).
-    with(event)
+  expect { Downstream.publish event }
+    .to have_enqueued_async_subscriber_for(MySubscriberService)
+    .with(event)
 end
 ```
 

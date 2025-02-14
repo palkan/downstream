@@ -1,4 +1,0 @@
-pre-commit:
-  commands:
-    rubocop:
-      runner: dip {cmd}

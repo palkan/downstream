@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
-require "bundler/setup"
-require "debug"
-require "rspec"
+begin
+  require "debug" unless ENV["CI"]
+rescue LoadError
+end
+
+ENV["RAILS_ENV"] = "test"
+
+# https://github.com/rails/rails/issues/54263
+require "logger"
 
 require "combustion"
 Combustion.initialize! :active_record, :action_controller, :active_job do

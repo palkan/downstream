@@ -10,6 +10,14 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/palkan/downstream"
   spec.license = "MIT"
 
+  spec.metadata = {
+    "bug_tracker_uri" => "http://github.com/palkan/downstream/issues",
+    "changelog_uri" => "https://github.com/palkan/downstream/blob/master/CHANGELOG.md",
+    "documentation_uri" => "http://github.com/palkan/downstream",
+    "homepage_uri" => "http://github.com/palkan/downstream",
+    "source_code_uri" => "http://github.com/palkan/downstream"
+  }
+
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
   if spec.respond_to?(:metadata)
@@ -20,8 +28,6 @@ Gem::Specification.new do |spec|
   end
 
   spec.files = Dir.glob("lib/**/*") + %w[LICENSE.txt README.md]
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.7"
 
@@ -29,13 +35,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "globalid", "~> 1.0"
   spec.add_dependency "rails", ">= 6"
 
-  spec.add_development_dependency "appraisal", "~> 2.2"
   spec.add_development_dependency "bundler", ">= 1.16"
   spec.add_development_dependency "combustion", "~> 1.3"
-  spec.add_development_dependency "debug", "~> 1.3"
-  spec.add_development_dependency "rake", "~> 13.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rake", ">= 13.0"
   spec.add_development_dependency "rspec-rails", "~> 6.0"
-  spec.add_development_dependency "sqlite3", "~> 1.4.0"
-  spec.add_development_dependency "standard", "~> 1.3"
 end

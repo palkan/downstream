@@ -1,15 +1,25 @@
-require: standard
+require:
+  - standard/cop/block_single_line_braces
 
 inherit_gem:
   standard: config/base.yml
 
 AllCops:
-  TargetRubyVersion: 2.6
   Exclude:
-    - 'gemfiles/*'
+    - 'bin/*'
     - 'tmp/**/*'
+    - 'Gemfile'
+    - 'vendor/**/*'
+    - 'gemfiles/**/*'
+    - 'lib/.rbnext/**/*'
+    - 'lib/generators/**/templates/*.rb'
+    - 'spec/internal/db/**/*'
   DisplayCopNames: true
   SuggestExtensions: false
+  NewCops: disable
+
+Standard/BlockSingleLineBraces:
+  Enabled: false
 
 Style/FrozenStringLiteralComment:
   Enabled: true

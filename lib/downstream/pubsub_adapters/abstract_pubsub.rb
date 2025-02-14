@@ -2,6 +2,10 @@
 
 module Downstream
   class AbstractPubsub
+    def reset
+      raise NotImplementedError
+    end
+
     def subscribe(identifier, callable)
       raise NotImplementedError
     end

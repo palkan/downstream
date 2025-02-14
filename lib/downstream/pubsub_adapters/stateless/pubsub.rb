@@ -6,8 +6,20 @@ require_relative "subscriber"
 module Downstream
   module Stateless
     class Pubsub < AbstractPubsub
+      def initialize
+        @subscribers = []
+      end
+
+      def reset
+        @subscribers.each(&:unsubscribe)
+        @subscribers.clear
+      end
+
       def subscribe(identifier, callable, async: false)
-        Subscriber.new(callable, async: async).tap { |s| s.subscribe(identifier) }
+        Subscriber.new(callable, async: async).tap do |s|
+          s.subscribe(identifier)
+          @subscribers << s
+        end
       end
 
       def subscribed(identifier, callable, &block)

@@ -7,6 +7,7 @@ module Downstream
     config.downstream = Downstream.config
 
     config.to_prepare do
+      Downstream.pubsub.reset
       ActiveSupport.run_load_hooks("downstream-events", Downstream)
     end
   end

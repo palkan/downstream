@@ -8,6 +8,7 @@ require "after_commit_everywhere"
 
 require "downstream/config"
 require "downstream/event"
+require "downstream/data_event"
 require "downstream/pubsub_adapters/abstract_pubsub"
 require "downstream/subscriber_job"
 

@@ -59,6 +59,22 @@ Each event has predefined (_reserved_) fields:
 
 Events are stored in `app/events` folder.
 
+You can also define events using the Data-interface:
+
+```ruby
+ProfileCreated = Downstream::Event.define(:user)
+
+# or with an explicit identifier
+ProfileCreated = Downstream::Event.define(:user) do
+  self.identifier = "user.profile_created"
+end
+```
+
+Date-events provide the same interface as regular events but use Data classes for keeping event payloads (`event.data`) and are frozen (as well as their derivatives, such as `event.to_h`).
+
+> [!NOTE]
+> Data-events are only available in Ruby 3.2+.
+
 ### Publish events
 
 To publish an event you must first create an instance of the event class and call `Downstream.publish` method:

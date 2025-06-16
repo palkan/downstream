@@ -74,7 +74,7 @@ module Downstream
     end
 
     def failure_message
-      (+"expected to publish #{event_class.identifier} event").tap do |msg|
+      "expected to publish #{event_class.identifier} event".tap do |msg|
         msg << " #{message_expectation_modifier}, but haven't published"
       end
     end

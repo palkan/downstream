@@ -9,4 +9,8 @@ AllCops:
 
 Naming/FileName:
   Exclude:
-   - '**/*.md'
+    - '**/*.md'
+
+Lint/ConstantReassignment:
+  Exclude:
+    - '**/*.md'

@@ -2,6 +2,8 @@
 
 ## master
 
+- Added `Downstream::Event.define` to use Data-backed event payloads.
+
 ## 1.6.0 (2025-02-14)
 
 - Reset subscribers on code reloading to avoid double execution.

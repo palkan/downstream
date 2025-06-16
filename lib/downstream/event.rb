@@ -1,18 +1,5 @@
 # frozen_string_literal: true
 
-GlobalID::Locator.use "downstream" do |gid|
-  params = gid.params.each_with_object({}) do |(key, value), memo|
-    memo[key.to_sym] = if value.is_a?(String) && value.start_with?("gid://")
-      GlobalID::Locator.locate(value)
-    else
-      value
-    end
-  end
-
-  gid.model_name.constantize
-    .new(event_id: gid.model_id, **params)
-end
-
 module Downstream
   class Event
     extend ActiveModel::Naming
@@ -56,6 +43,20 @@ module Downstream
           end
       end
 
+      def define(*fields, &)
+        fields.each do |field|
+          raise ArgumentError, "#{field} is reserved" if RESERVED_ATTRIBUTES.include?(field)
+        end
+
+        data_class = ::Data.define(*fields)
+
+        Class.new(DataEvent, &).tap do
+          _1.data_class = data_class
+
+          _1.delegate(*fields, to: :data)
+        end
+      end
+
       def i18n_scope
         :activemodel
       end
@@ -94,7 +95,7 @@ module Downstream
     end
 
     def to_global_id
-      new_data = data.each_with_object({}) do |(key, value), memo|
+      new_data = data.to_h.each_with_object({}) do |(key, value), memo|
         memo[key] = if value.respond_to?(:to_global_id)
           value.to_global_id
         else

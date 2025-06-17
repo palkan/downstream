@@ -19,7 +19,7 @@ describe Downstream::Event do
     end
 
     specify "inferred" do
-      expect(Downstream::AnotherTestEvent.identifier).to eq "downstream.another_test_event"
+      expect(Downstream::AnotherTestEvent.identifier).to eq "downstream.another_test"
     end
   end
 

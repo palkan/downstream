@@ -16,6 +16,18 @@ module TestSubscriptions
   end
 end
 
+class TestSubscriber < Downstream::Subscriber
+  class << self
+    def events
+      @events ||= []
+    end
+  end
+
+  def test_event(event) = self.class.events << event
+
+  alias_method :another_test, :test_event
+end
+
 describe "sync #subscribe" do
   let(:event_class) { Downstream::TestEvent }
 
@@ -75,6 +87,27 @@ describe "sync #subscribe" do
       expect(callable.events.size).to eq 2
       expect(callable.events.last).to eq event2
     end
+  end
+
+  it "subscribes with a subscriber", skip: !defined?(::Data) do
+    Downstream.subscribe(TestSubscriber)
+
+    event = event_class.new(user_id: 0)
+
+    Downstream.publish event
+
+    expect(TestSubscriber.events.size).to eq 1
+    expect(TestSubscriber.events.last).to eq event
+
+    another_event_class = ::Downstream::Event.define(:user_id, :action_type) do
+      self.identifier = "another_test"
+    end
+
+    event2 = another_event_class.new(user_id: 42, action_type: "leave")
+    Downstream.publish event2
+
+    expect(TestSubscriber.events.size).to eq 2
+    expect(TestSubscriber.events.last).to eq event2
   end
 
   it "temporary subscribes" do

@@ -9,6 +9,7 @@ require "after_commit_everywhere"
 require "downstream/config"
 require "downstream/event"
 require "downstream/data_event"
+require "downstream/subscriber"
 require "downstream/pubsub_adapters/abstract_pubsub"
 require "downstream/subscriber_job"
 
@@ -28,18 +29,26 @@ module Downstream
       subscriber ||= block if block
       raise ArgumentError, "Subsriber must be present" if subscriber.nil?
 
-      identifier = construct_identifier(subscriber, to)
+      construct_identifiers(subscriber, to).map do
+        pubsub.subscribe(_1, subscriber, async: async)
+      end.then do
+        next _1.first if _1.size == 1
 
-      pubsub.subscribe(identifier, subscriber, async: async)
+        _1
+      end
     end
 
     # temporary subscriptions
     def subscribed(subscriber, to: nil, &block)
       raise ArgumentError, "Subsriber must be present" if subscriber.nil?
 
-      identifier = construct_identifier(subscriber, to)
+      construct_identifiers(subscriber, to).map do
+        pubsub.subscribed(_1, subscriber, &block)
+      end.then do
+        next _1.first if _1.size == 1
 
-      pubsub.subscribed(identifier, subscriber, &block)
+        _1
+      end
     end
 
     def publish(event)
@@ -48,28 +57,34 @@ module Downstream
 
     private
 
-    def construct_identifier(subscriber, to)
-      to ||= infer_event_from_subscriber(subscriber) if subscriber.is_a?(Module)
+    def construct_identifiers(subscriber, to)
+      to ||= infer_events_from_subscriber(subscriber) if subscriber.is_a?(Module)
 
       if to.nil?
         raise ArgumentError, "Couldn't infer event from subscriber. " \
                               "Please, specify event using `to:` option"
       end
 
-      identifier = if to.is_a?(Class) && Event >= to # rubocop:disable Style/YodaCondition
-        to.identifier
-      else
-        to
-      end
+      Array(to).map do
+        identifier = if _1.is_a?(Class) && Event >= _1 # rubocop:disable Style/YodaCondition
+          _1.identifier
+        else
+          _1
+        end
 
-      "#{config.namespace}.#{identifier}"
+        "#{config.namespace}.#{identifier}"
+      end
     end
 
-    def infer_event_from_subscriber(subscriber)
+    def infer_events_from_subscriber(subscriber)
+      if subscriber.is_a?(Class) && Subscriber >= subscriber # rubocop:disable Style/YodaCondition
+        return subscriber.event_names
+      end
+
       event_class_name = subscriber.name.split("::").yield_self do |parts|
         # handle explicti top-level name, e.g. ::Some::Event
         parts.shift if parts.first.empty?
-        # drop last part – it's a unique subscriber name
+        # drop last part—it's a unique subscriber name
         parts.pop
 
         parts.last.sub!(/^On/, "")

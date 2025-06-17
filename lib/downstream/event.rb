@@ -13,7 +13,7 @@ module Downstream
       def identifier
         return @identifier if instance_variable_defined?(:@identifier)
 
-        @identifier = name.underscore.tr("/", ".")
+        @identifier = name.underscore.tr("/", ".").gsub(/_event$/, "")
       end
 
       # define store readers

@@ -31,7 +31,7 @@ describe Downstream::Event, skip: !defined?(Data) do
 
     specify "inferred" do
       stub_const("Downstream::DataTestEvent", Downstream::Event.define(:user_id))
-      expect(Downstream::DataTestEvent.identifier).to eq "downstream.data_test_event"
+      expect(Downstream::DataTestEvent.identifier).to eq "downstream.data_test"
     end
   end
 

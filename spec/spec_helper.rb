@@ -40,6 +40,7 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
 
   config.after(:each) do
+    Downstream.pubsub.reset
     # Clear ActiveJob jobs
     ActiveJob::Base.queue_adapter.enqueued_jobs.clear
     ActiveJob::Base.queue_adapter.performed_jobs.clear

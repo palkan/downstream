@@ -44,7 +44,7 @@ describe "RSpec matchers" do
         expect do
           expect { Downstream.publish event }
             .to have_published_event(Downstream::AnotherTestEvent)
-        end.to raise_error(/to publish downstream.another_test_event.+exactly once, but/)
+        end.to raise_error(/to publish downstream.another_test.+exactly once, but/)
       end
 
       specify "attributes don't match" do

@@ -143,6 +143,26 @@ store.subscribe OnProfileCreated::DoThat, async: {queue: :low_priority}
 
 **NOTE:** all subscribers are synchronous by default
 
+### Subscriber classes
+
+You can also use subscriber objects based on `Downstream::Subscriber` class. For example:
+
+```ruby
+class CRMSubscriber < Downstream::Subscriber
+  def profile_created(event)
+    # handle "profile_created" event
+  end
+
+  def project_created(event)
+    # handle "project_created" event
+  end
+end
+
+store.subscribe CRMSubscriber, async: true
+```
+
+The subscriber object allows you to subscribe to multiple events at once: each public method is considered an event handler for the same named event.
+
 ## Testing
 
 You can test subscribers as normal Ruby objects.
